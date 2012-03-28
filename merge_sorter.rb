@@ -19,23 +19,26 @@ class MergeSorter
   # array.
 
   attr_accessor :input, :inversions
-  def initialize()
-    self.inversions = []
+  def initialize(filename=nil)
+    self.inversions = 0
+    self.input = []
+    if filename
+      File.open(filename) do |f|
+        f.each_line{|line| input << line.chomp.to_i}
+      end
+    end
   end
 
   def divide(array)
-    #puts "input = #{array.inspect}"
     return array if array.size == 1
     m = ((array.size-1)/2).floor
     output = merge(divide(array[0..m]), divide(array[m+1...array.size]))
-    #puts "merge result = #{output.inspect}"
     return output
   end
 
 
   private
   def merge(arr1, arr2)
-#    puts "calling merge with #{arr1.inspect} #{arr2.inspect}"
     i,j = 0, 0
     output = []
     while(i < arr1.size && j < arr2.size) do
@@ -44,7 +47,7 @@ class MergeSorter
         i += 1
       else
         output << arr2[j]
-        arr1[i...arr1.size].each{|x| inversions << [x, arr2[j]]}
+        self.inversions += (arr1.size - i)
         j += 1
       end
     end
@@ -59,8 +62,11 @@ class MergeSorter
 end
 
 
-a= [5,15, 2, 9, 8, 7]
-m = MergeSorter.new
-puts "sorted array = #{m.divide(a)}"
+#a= [5,15, 2, 9, 8, 7]
+#a=[1,2,3,4,5,6,7,8,9,10]
+m = MergeSorter.new("IntegerArray.txt")
+#puts m.input.inspect
+m.divide(m.input)
+#puts "sorted array = #{m.divide(m.input)}"
 puts "*"*100
 puts "inversions = #{m.inversions}"
